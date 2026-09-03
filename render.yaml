@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: fashion-classifier
+    runtime: node
+    region: oregon          # change to your preferred region
+    plan: free              # upgrade as needed
+
+    # Render clones the repo and runs commands from the repo root.
+    # The Next.js project lives one level deeper.
+    rootDir: fashion-classifier
+
+    buildCommand: npm ci --omit=dev && npm run build
+    startCommand: node .next/standalone/server.js
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: HOSTNAME
+        value: "0.0.0.0"
