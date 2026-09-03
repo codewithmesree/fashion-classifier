@@ -1,0 +1,12 @@
+# Python dependencies for scripts/train_mobilenet.py
+# Used locally to train the MobileNetV2 model and export it to TF.js format.
+# Not used by the Next.js app or Render deployment.
+#
+# Install with:
+#   pip install -r requirements.txt
+
+tensorflow>=2.13,<3.0
+tensorflowjs>=4.10.0
+numpy>=1.24,<2.0
+scikit-learn>=1.3.0
+tqdm>=4.66.0
