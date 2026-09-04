@@ -82,6 +82,20 @@ export default function UploadSwatch({ onSample, onClear, disabled }: Props) {
     if (onClear) onClear();
   }, [onClear]);
 
+  const loadSampleUrl = useCallback(
+    async (url: string) => {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const file = new File([blob], "sample.jpg", { type: "image/jpeg" });
+        await handleFile(file);
+      } catch (err) {
+        console.error("Failed to load sample:", err);
+      }
+    },
+    [handleFile]
+  );
+
   return (
     <div className="flex w-full flex-col gap-3">
       <div
@@ -145,6 +159,29 @@ export default function UploadSwatch({ onSample, onClear, disabled }: Props) {
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0])}
         />
+      </div>
+
+      {/* Quick Test Samples */}
+      <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+        <span className="font-tag text-[11px] uppercase tracking-wider text-muted">Try sample:</span>
+        <button
+          type="button"
+          id="sample-tshirt-btn"
+          onClick={() => loadSampleUrl("/samples/tshirt.jpg")}
+          disabled={disabled}
+          className="rounded border border-denim/40 bg-paper px-2.5 py-1 font-tag text-[11px] uppercase tracking-wider text-denim shadow-xs hover:bg-canvas transition-colors"
+        >
+          T-Shirt
+        </button>
+        <button
+          type="button"
+          id="sample-sneaker-btn"
+          onClick={() => loadSampleUrl("/samples/sneaker.jpg")}
+          disabled={disabled}
+          className="rounded border border-denim/40 bg-paper px-2.5 py-1 font-tag text-[11px] uppercase tracking-wider text-denim shadow-xs hover:bg-canvas transition-colors"
+        >
+          Sneaker
+        </button>
       </div>
 
       {preview && (
