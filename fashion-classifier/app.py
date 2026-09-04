@@ -22,8 +22,8 @@ Output:
 
 from __future__ import annotations
 
-import os
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List
 
@@ -142,6 +142,18 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # FastAPI app
 # ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    """Pre-load the Keras model before the server accepts requests."""
+    try:
+        _load_model()
+    except RuntimeError as exc:
+        # Log but don't crash — /predict will surface the error gracefully.
+        logger.warning("Model could not be loaded at startup: %s", exc)
+    yield
+    # (shutdown logic could go here if needed)
+
+
 app = FastAPI(
     title="Fashion Classifier API",
     description=(
@@ -149,6 +161,7 @@ app = FastAPI(
         "Upload a clothing photo to GET a prediction over 10 Fashion-MNIST classes."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Allow the Next.js frontend (any origin in dev; restrict in production as needed)
@@ -252,16 +265,3 @@ async def predict(file: UploadFile = File(...)):
     )
 
 
-# ---------------------------------------------------------------------------
-# Startup event — pre-load model so the first request isn't slow
-# ---------------------------------------------------------------------------
-
-@app.on_event("startup")
-def on_startup():
-    """Pre-load the Keras model into memory when the server starts."""
-    try:
-        _load_model()
-    except RuntimeError as exc:
-        # Log but don't crash the process — /predict will surface the error
-        # gracefully when called.
-        logger.warning("Model could not be loaded at startup: %s", exc)
