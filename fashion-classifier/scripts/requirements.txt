@@ -1,10 +1,17 @@
-# Python dependencies for scripts/train_mobilenet.py
-# Used locally to train the MobileNetV2 model and export it to TF.js format.
-# Not used by the Next.js app or Render deployment.
+# Python dependencies — Render API server + local training scripts
 #
-# Install with:
-#   pip install -r requirements.txt
+# The Render build command installs this file:
+#   pip install -r scripts/requirements.txt
+#
+# ── API runtime (required on Render) ──────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9   # required by FastAPI for file uploads
+pillow>=10.0.0            # image decoding in app.py
 
+# ── ML — model loading + local training ───────────────────────────────────────
+# tensorflowjs is needed at runtime (app.py loads the TF.js layers-model).
+# tensorflow + the other packages are also used by scripts/train_mobilenet.py.
 tensorflow>=2.13,<3.0
 tensorflowjs>=4.10.0
 numpy>=1.24,<2.0
