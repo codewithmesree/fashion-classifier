@@ -94,7 +94,13 @@ def _load_model():
 
     logger.info("Loading TF.js model from %s …", MODEL_JSON)
     try:
-        import tensorflowjs as tfjs
+        import tensorflowjs as tfjs  # type: ignore[import-untyped]
+    except ImportError as exc:
+        raise RuntimeError(
+            "tensorflowjs is not installed. "
+            "Run: pip install -r scripts/requirements.txt"
+        ) from exc
+    try:
         _keras_model = tfjs.converters.load_keras_model(str(MODEL_JSON))
     except Exception as exc:
         raise RuntimeError(f"Failed to load model: {exc}") from exc
